@@ -15,5 +15,5 @@
 
 ## 发布前事项
 
-本仓库尚未创建远程仓库或推送。获得确认后，再创建 GitHub 仓库、推送 `main`、配置部署并验证 GitHub Actions。
+本仓库已推送至 GitHub；GitHub Pages 已通过 Actions 成功部署。`Update AI news` 成功完成后会自动触发 Pages 再部署，公开站点已完成线上验证。
 diff --git a/DEVELOPMENT_NOTES.md b/DEVELOPMENT_NOTES.md
