@@ -1,0 +1,10 @@
+{
+  "name": "daily-ai-brief",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "update": "node scripts/fetch-news.mjs",
+    "check": "node scripts/check-news.mjs"
+  }
+}
