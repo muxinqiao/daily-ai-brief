@@ -1,4 +1,5 @@
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
+import { mergeNews } from "./news-data.mjs";
 
 const OUTPUT = new URL("../public/data/news.json", import.meta.url);
 const SOURCES = [
@@ -40,28 +41,14 @@ const existing = await loadExisting();
 const results = await Promise.allSettled(SOURCES.map(async (source) => {
   const response = await fetch(source.url, { headers: { "user-agent": "daily-ai-brief/1.0" } });
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
-  return [source.name, parseFeed(await response.text(), source)];
+  return parseFeed(await response.text(), source);
 }));
 
-const sources = {};
-let incoming = [];
-for (const [index, result] of results.entries()) {
-  const source = SOURCES[index];
-  if (result.status === "fulfilled") {
-    incoming.push(...result.value[1]);
-    sources[source.name] = { status: "ok", checkedAt: now, count: result.value[1].length };
-  } else {
-    sources[source.name] = { status: "failed", checkedAt: now, message: result.reason.message };
-  }
-}
+const data = mergeNews(existing, SOURCES.map((source, index) => ({ name: source.name, result: results[index] })), now);
 
-const deduped = new Map(existing.articles.map((article) => [article.url, article]));
-for (const article of incoming) deduped.set(article.url, { ...article, collectedAt: now });
-const articles = [...deduped.values()].sort((a, b) => new Date(b.publishedAt || 0) - new Date(a.publishedAt || 0)).slice(0, 200);
-
-if (!incoming.length && !existing.articles.length) throw new Error("所有来源均不可用，未生成空数据文件。");
+if (!data.update.fetchedCount && !existing.articles.length) throw new Error("所有来源均不可用，未生成空数据文件。");
 await mkdir(new URL(".", OUTPUT), { recursive: true });
 const temporary = new URL("news.tmp.json", OUTPUT);
-await writeFile(temporary, JSON.stringify({ updatedAt: now, timezone: "Asia/Shanghai", articles, sources }, null, 2));
+await writeFile(temporary, JSON.stringify(data, null, 2));
 await rename(temporary, OUTPUT);
-console.log(`更新完成：${incoming.length} 条输入，保存 ${articles.length} 条。`);
+console.log(`更新完成：抓取 ${data.update.fetchedCount} 条，新增 ${data.update.newCount} 条，保存 ${data.articles.length} 条。`);

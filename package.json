@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "update": "node scripts/fetch-news.mjs",
-    "check": "node scripts/check-news.mjs"
+    "check": "node scripts/check-news.mjs",
+    "test": "node scripts/test-news-data.mjs"
   }
 }
