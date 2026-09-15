@@ -10,11 +10,11 @@
 | 浏览器验收 | 已在桌面与 400px 手机视图确认双列／单列布局、卡片渲染、关键词搜索、来源筛选、时间范围、清除条件、原文链接、发布时间与采集时间正常。 |
 | 受控边界数据（数据层） | 本轮 `npm test` 使用缺失发布时间和长标题的本地数据，确认缺失发布时间不会被伪造、长标题不会在数据层截断。该验证不修改真实 `news.json`。 |
 | 受控边界数据（浏览器视觉） | 2026-09-15 通过仅本机可访问的临时受控页面进行人工验收：缺失发布时间显示“发布时间：未知”；超长标题正常换行、未横向溢出；桌面为双列、400px 为单列。临时数据未写回真实 `news.json`。 |
-| 自动部署链路 | 手动 `Update AI news #2` 成功；随后 `Deploy GitHub Pages #4` 由 `workflow_run` 自动触发并成功。公开站点：<https://muxinqiao.github.io/daily-ai-brief/>。 |
+| 自动更新与部署链路 | 手动 `Update AI news #2` 与其后的 `Deploy GitHub Pages #4` 均成功；2026-09-15 的计划 `Update AI news #3`（`schedule`）成功，随后 `Deploy GitHub Pages #5` 由 `workflow_run` 自动触发并成功。公开站点：<https://muxinqiao.github.io/daily-ai-brief/>。 |
 
 ## 未验证
 
-- `Update AI news` 已配置每日 01:15 UTC（Asia/Shanghai 09:15）的 cron 触发，但当前没有 `schedule` 类型的成功运行记录。手动触发与其后的自动 Pages 部署已验证，计划 cron 触发尚未验证。
+- 无。
 
 ## 未完成
 

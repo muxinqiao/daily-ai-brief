@@ -16,4 +16,4 @@
 
 ## 待验证
 
-- `Update AI news` 的每日 cron 已配置，但尚无 `schedule` 类型的成功运行记录。手动触发和成功后的 `workflow_run` Pages 部署已验证。
+- 无。
