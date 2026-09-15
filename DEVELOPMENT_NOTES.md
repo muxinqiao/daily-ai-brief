@@ -25,7 +25,6 @@
 ## 数据处理边界
 
 - 容量上限为 200 条，按原文 URL 去重；单来源失败保留旧数据，并区分 `updated`、`no-new-content` 与 `partial-failure`。
-- 原始面试题 DOCX 仅作本地参考，已由 `.gitignore` 精确排除，不纳入 Git。
 
 ## 已完成发布
 
