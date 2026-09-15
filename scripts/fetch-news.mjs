@@ -1,5 +1,5 @@
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
-import { mergeNews } from "./news-data.mjs";
+import { isSafeArticleUrl, mergeNews } from "./news-data.mjs";
 
 const OUTPUT = new URL("../public/data/news.json", import.meta.url);
 const SOURCES = [
@@ -29,7 +29,7 @@ function parseFeed(xml, source) {
     url: link(block),
     publishedAt: tag(block, ["pubDate", "published", "updated"]),
     source: source.name,
-  })).filter((item) => item.title && item.url && source.match(item));
+  })).filter((item) => item.title && isSafeArticleUrl(item.url) && source.match(item));
 }
 
 async function loadExisting() {

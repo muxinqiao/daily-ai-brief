@@ -1,54 +1,27 @@
 # 验证记录
 
-## 已验证基线
+## 已验证
 
-基线提交：`41ee812 feat: add daily AI news station`
-
-| 项目 | 结果 |
+| 项目 | 结果与证据 |
 | --- | --- |
-| OpenAI News RSS | 成功 |
-| Google DeepMind RSS | 成功 |
-| 输入与保留量 | 1,292 条输入，保留 200 条 |
-| 重复更新 | 不产生重复记录 |
-| 新闻卡片 | 已验收 |
-| 原文链接 | 已验收 |
-| 搜索筛选 | 已验收 |
-| 移动端单列布局 | 已验收 |
-| 验收环境 | 浏览器、Codex 内置浏览器 |
+| 模拟容错测试 | 本轮 `npm test` 通过。测试使用固定本地数据，覆盖重复输入、单来源失败、无新内容；不访问外部 RSS。 |
+| 真实 RSS 抓取 | 已执行的 `npm run update` 真实抓取 1,293 条候选资讯，保存 200 条；后续运行新增 0 条，状态为 `no-new-content`。 |
+| 保存数据校验 | 本轮 `npm run check` 通过：当前 200 条新闻，链接无重复，必要字段完整。 |
+| 浏览器验收 | 已在桌面与 400px 手机视图确认双列／单列布局、卡片渲染、关键词搜索、来源筛选、时间范围、清除条件、原文链接、发布时间与采集时间正常。 |
+| 受控边界数据 | 本轮 `npm test` 使用缺失发布时间和长标题的本地数据，确认缺失发布时间不会被伪造、长标题不会在数据层截断。该验证不修改真实 `news.json`。 |
+| 自动部署链路 | 手动 `Update AI news #2` 成功；随后 `Deploy GitHub Pages #4` 由 `workflow_run` 自动触发并成功。公开站点：<https://muxinqiao.github.io/daily-ai-brief/>。 |
+| 原始题目隔离 | `开发实作测试题_每日AI情报站_候选人版.docx` 被 `.gitignore` 精确忽略，且未被 Git 跟踪。 |
 
-## 本轮提交前检查
+## 未验证
 
-本轮应确认以下事项：
+- `Update AI news` 已配置每日 01:15 UTC（Asia/Shanghai 09:15）的 cron 触发，但当前没有 `schedule` 类型的成功运行记录。手动触发与其后的自动 Pages 部署已验证，计划 cron 触发尚未验证。
 
-1. `git status` 中只包含 `DEV_STATE.md`、`README.md`、`DEVELOPMENT_NOTES.md`、`VERIFICATION.md` 与 `.gitignore` 的预期变更。
-2. 面试题 DOCX 被 `.gitignore` 排除，未被暂存。
-3. 第二个本地提交仅包含上述交付文档和 `.gitignore`。
+## 未完成
 
-## 发布后验证（已完成）
+- 缺失发布时间与长标题的浏览器视觉复验尚未重跑；页面已有“发布时间：未知”回退与常规标题换行实现，但本轮未将其作为新的视觉验证证据。
 
-已完成远程仓库创建、推送、GitHub Pages 部署、线上 RSS 内容、搜索、原文链接与移动端布局验证。详细证据见下方“2026-09-14：自动更新与 GitHub Pages 联动复验”。
+## GitHub Actions Node.js 20 Warning 说明
 
-## 2026-09-14：自动更新与 GitHub Pages 联动复验
+Pages 部署日志曾出现 GitHub 官方 Actions 内部 Node.js 20 运行时弃用的上游平台警告。该警告不代表项目抓取脚本使用 Node.js 20，也不影响已成功的部署。
 
-### 模拟容错验证
-
-- `npm test` 通过：使用固定本地测试数据，覆盖重复输入、单来源抓取失败、无新内容三种情形；该测试不访问外部 RSS。
-
-### 真实 RSS 抓取与数据校验
-
-- `npm run update` 成功：真实抓取 1293 条候选资讯，按 200 条上限保存；后续重复运行显示新增 0 条，符合“无新内容”状态。
-- `npm run check` 通过：对真实抓取后保存的数据校验，数据保留 200 条、链接无重复。
-- 浏览器人工验收通过：桌面双列、400px 手机单列、关键词搜索、来源筛选、时间范围、清除条件、原文链接、发布时间与采集时间均正常。
-
-### GitHub Actions 与部署验证
-
-- 本地技术提交已推送到 `main`：`6018ca7 feat: improve news update resilience`。
-- 手动触发的 `Update AI news` 工作流成功。
-- `Deploy GitHub Pages #4` 成功，触发方式为 `workflow_run`；这验证了“Update AI news 成功完成后，自动重新部署 GitHub Pages”的链路。
-- 公开站点：<https://muxinqiao.github.io/daily-ai-brief/>
-
-### Node.js 20 Warning 说明
-
-Pages 部署日志出现一条 GitHub Actions 平台警告：`actions/checkout@v4`、`actions/configure-pages@v5`、`actions/deploy-pages@v4`、`actions/upload-pages-artifact@v4` 的内部 Node.js 20 运行时已弃用。
-
-该警告不代表项目抓取脚本使用了 Node.js 20，也不影响本次部署。项目脚本由 `actions/setup-node` 使用 Node.js 22 运行；GitHub 托管 Runner 已将上述官方 Action 强制切换至 Node.js 24，本次部署状态为成功。此项记录为上游官方 Action 迁移提示，当前不需要为此引入非官方依赖或不稳定的版本固定。
+项目工作流通过 `actions/setup-node@v4` 使用 Node.js 22。当前 Pages 工作流使用 `actions/checkout@v4`、`actions/configure-pages@v5`、`actions/upload-pages-artifact@v3` 与 `actions/deploy-pages@v4`；不因该上游迁移提示引入非官方依赖或不稳定的版本固定。

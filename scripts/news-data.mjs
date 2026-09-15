@@ -1,5 +1,13 @@
 export const MAX_ARTICLES = 200;
 
+
+export function isSafeArticleUrl(value) {
+  try {
+    return ["http:", "https:"].includes(new URL(value).protocol);
+  } catch {
+    return false;
+  }
+}
 export function mergeNews(existing, outcomes, now) {
   const previous = existing.articles ?? [];
   const knownUrls = new Set(previous.map((article) => article.url));

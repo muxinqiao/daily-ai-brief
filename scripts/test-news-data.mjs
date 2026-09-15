@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mergeNews } from "./news-data.mjs";
+import { isSafeArticleUrl, mergeNews } from "./news-data.mjs";
 
 const now = "2026-09-14T00:00:00.000Z";
 const existing = {
@@ -23,4 +23,12 @@ const noNewContent = mergeNews(existing, [
 ], now);
 
 assert.equal(noNewContent.update.status, "no-new-content", "应区分没有新内容");
+assert.equal(isSafeArticleUrl("https://example.com/news"), true, "应保留 HTTPS 原文链接");
+assert.equal(isSafeArticleUrl("http://example.com/news"), true, "应保留 HTTP 原文链接");
+assert.equal(isSafeArticleUrl("javascript:alert(1)"), false, "不应接受非 HTTP 原文链接");
+assert.equal(isSafeArticleUrl("not a URL"), false, "不应接受无效原文链接");
+const edgeArticle = { title: "长标题".repeat(80), summary: "", source: "OpenAI News", url: "https://example.com/edge", publishedAt: "" };
+const edgeResult = mergeNews({ articles: [] }, [{ name: "OpenAI News", result: { status: "fulfilled", value: [edgeArticle] } }], now);
+assert.equal(edgeResult.articles[0].publishedAt, "", "缺失发布时间不得被伪造");
+assert.equal(edgeResult.articles[0].title, edgeArticle.title, "长标题不得在数据处理时被截断");
 console.log("容错检查通过：重复输入、单来源失败和无新内容均符合预期。");
